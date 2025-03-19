@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  flyway:
+    image: flyway/flyway:latest
+    command: migrate
+    depends_on:
+      - postgres
+    volumes:
+      - ./migrations:/flyway/sql
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      FLYWAY_USER: ${DB_USER}
+      FLYWAY_PASSWORD: ${DB_PASSWORD}
+      FLYWAY_DEFAULT_SCHEMA: ${DB_SCHEMA}
+      FLYWAY_CREATE_SCHEMAS: true
+      FLYWAY_CONNECT_RETRIES: 60
+      FLYWAY_VALIDATE_MIGRATION_NAMING: true
